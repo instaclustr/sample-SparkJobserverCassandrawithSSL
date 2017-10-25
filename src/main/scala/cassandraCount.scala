@@ -17,7 +17,7 @@ object cassandraCount extends SparkJob {
 
   //runJob is where the actual work of the job goes
   override def runJob(sc: SparkContext, config: Config): Any = {
-    val rdd = sc.cassandraTable("system", "schema_keyspaces") //create an rdd from the system.schema_keyspaces table
+    val rdd = sc.cassandraTable("system_schema", "keyspaces") //create an rdd from the system_schema.keyspaces table
     val num_row = rdd.count() // count the number of rows in the rdd
     num_row // return the result
   }

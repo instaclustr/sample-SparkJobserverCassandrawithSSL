@@ -19,6 +19,12 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
+import com.datastax.spark.connector.cql.*;
+import com.datastax.spark.connector.cql.Scanner;
+import scala.collection.JavaConversions.*;
+import scala.collection.IndexedSeq;
+import com.datastax.spark.connector.rdd.ReadConf;
+
 
 public class CustomCassandraConnectionFactory implements CassandraConnectionFactory {
     @Override
@@ -39,6 +45,11 @@ public class CustomCassandraConnectionFactory implements CassandraConnectionFact
         }
     }
 
+   @Override
+   public Scanner getScanner (ReadConf readConf, CassandraConnectorConf connConf, IndexedSeq<String> columnNames){
+	   return new DefaultScanner(readConf, connConf, columnNames);
+   }
+
     private Cluster.Builder clusterBuilder(CassandraConnectorConf conf) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         SocketOptions socketOptions = new SocketOptions();
         socketOptions.setConnectTimeoutMillis(conf.connectTimeoutMillis());
@@ -55,7 +66,7 @@ public class CustomCassandraConnectionFactory implements CassandraConnectionFact
                 .addContactPoints(hosts.toArray(new Inet4Address[0]))
                 .withPort(conf.port())
                 .withRetryPolicy(
-                        new MultipleRetryPolicy(conf.queryRetryCount(), conf.queryRetryDelay()))
+                        new MultipleRetryPolicy(conf.queryRetryCount()))
                 .withReconnectionPolicy(
                         new ExponentialReconnectionPolicy(conf.minReconnectionDelayMillis(), conf.maxReconnectionDelayMillis()))
                 .withLoadBalancingPolicy(
