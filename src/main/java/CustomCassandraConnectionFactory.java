@@ -19,6 +19,12 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
+import com.datastax.spark.connector.cql.*;
+import com.datastax.spark.connector.cql.Scanner;
+import scala.collection.JavaConversions.*;
+import scala.collection.IndexedSeq;
+import com.datastax.spark.connector.rdd.ReadConf;
+
 
 public class CustomCassandraConnectionFactory implements CassandraConnectionFactory {
     @Override
@@ -38,6 +44,11 @@ public class CustomCassandraConnectionFactory implements CassandraConnectionFact
             throw new RuntimeException(e);
         }
     }
+
+   @Override
+   public Scanner getScanner (ReadConf readConf, CassandraConnectorConf connConf, IndexedSeq<String> columnNames){
+	   return new DefaultScanner(readConf, connConf, columnNames);
+   }
 
     private Cluster.Builder clusterBuilder(CassandraConnectorConf conf) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         SocketOptions socketOptions = new SocketOptions();
